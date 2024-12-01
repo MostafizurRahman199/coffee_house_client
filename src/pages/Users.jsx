@@ -1,17 +1,31 @@
 import { LuClipboardEdit } from "react-icons/lu";
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLoaderData } from 'react-router-dom';
 import Swal from "sweetalert2";
 
 const Users = () => {
     const loadedUsers = useLoaderData();
     const [users, setUsers] = useState(loadedUsers);
+    const [loading, setLoading] = useState(true)
 
 
+    useEffect(() => {
+      if (Array.isArray(loadedUsers)) {
+        setLoading(false); 
+      }
+    }, [loadedUsers]);
+  
+   
+    if (loading) {
+      return <div className="flex min-h-96 justify-center items-center">
+        <span className="loading loading-spinner loading-lg"></span>
+      </div>; // Show loading spinner or message
+    }
+
+    
+    
+    
     const deleteUser = (id)=>{
-
-
-
         Swal.fire({
             title: "Are you sure?",
             text: "You won't be able to revert this!",
@@ -22,7 +36,7 @@ const Users = () => {
             confirmButtonText: "Yes, delete it!"
           }).then((result) => {
             if (result.isConfirmed) {
-                fetch(`http://localhost:5000/users/${id}`,{
+                fetch(`https://coffee-houser-server-second.vercel.app/users/${id}`,{
                     method:"DELETE",
                     headers:{
                         'content-type':'application/json'

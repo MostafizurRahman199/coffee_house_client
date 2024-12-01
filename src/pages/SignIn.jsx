@@ -46,7 +46,7 @@ const SignIn = () => {
             email, lastSignInTime
           }
 
-          fetch(`http://localhost:5000/users`, {
+          fetch(`https://coffee-houser-server-second.vercel.app/users`, {
             
             method:"PATCH",
             headers:{

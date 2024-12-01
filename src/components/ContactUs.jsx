@@ -10,8 +10,52 @@ import {
   import { FaPhoneAlt } from "react-icons/fa";
 
   import logoImage from "../assets/more/logo1.png"
+import Swal from "sweetalert2";
 
 const ContactUs = () => {
+
+
+const handleFromSubmit = (e)=>{
+  e.preventDefault();
+  const name = e.target.name.value;
+  const email = e.target.email.value;
+  const message = e.target.message.value;
+
+  const messageInfo = {
+    name: name,
+    email: email,
+    message: message
+  }
+
+
+  console.log(messageInfo);
+
+  fetch("http://localhost:5000/message", 
+   {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(messageInfo)
+   }
+  ).then(res=>res.json())
+  .then(data=>{
+    console.log(data);
+    if(data.success){
+      e.target.reset();
+      Swal.fire({
+        position: "top-center",
+        icon: "success",
+        title: "Message Sent Successfully",
+        showConfirmButton: false,
+        timer: 1500
+      });
+    }
+  })
+}
+
+
+
   return (
   <div className="w-10/12 mx-auto">
       
@@ -61,18 +105,21 @@ const ContactUs = () => {
                <h2 className="text-3xl font-semibold text-[#331A15] text-center mb-4" style={{ textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)' }}>
                  Connect with Us
                </h2>
-               <form className="space-y-4">
+               <form className="space-y-4" onSubmit={handleFromSubmit}>
                  <input
+                 name="name"
                    type="text"
                    placeholder="Name"
                    className="w-full p-3 bg-white border border-gray-300 rounded-2xl focus:outline-none focus:border-[#331A15]"
                  />
                  <input
+                 name="email"
                    type="email"
                    placeholder="Email"
                    className="w-full p-3 bg-white border border-gray-300 rounded-2xl focus:outline-none focus:border-[#331A15]"
                  />
                  <textarea
+                   name="message"
                    placeholder="Message"
                    rows="4"
                    className="w-full p-3 bg-white border border-gray-300 rounded-2xl focus:outline-none focus:border-[#331A15]"

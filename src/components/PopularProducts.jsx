@@ -2,50 +2,29 @@ import React, { useEffect, useState } from "react";
 import { FaTrashAlt, FaEdit, FaEye } from "react-icons/fa"; // Importing icons
 import { Link, useLoaderData } from "react-router-dom";
 import Swal from "sweetalert2";
+import { useFirebaseAuth } from "../Providers/AuthProvider";
+import { handleDelete } from "../utils/delete";
 
 const PopularProducts = () => {
 
+  const {user} = useFirebaseAuth();
   const loadCoffees = useLoaderData();
-  const [coffees, setCoffees] = useState(loadCoffees);
+  const [coffees, setCoffees] = useState(Array.isArray(loadCoffees) ? loadCoffees.slice(-4) : []);  // Ensure coffees is always an array
+  const [loading, setLoading] = useState(true);  // Loading state to handle async data
 
-
- // Handlers for actions
-  const handleDelete = (id) => {
-    Swal.fire({
-      title: "Are you sure?",
-      text: "You won't be able to revert this!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, delete it!",
-    }).then((result) => {
-     if(result.isConfirmed){
-      fetch(`http://localhost:5000/coffee/${id}`, {
-        method: "DELETE",
-       
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.deletedCount > 0) {
-            Swal.fire({
-              title: "Deleted!",
-              text: "Your coffee has been deleted.",
-              icon: "success",
-            });
-          }
-
-          const remainingCoffee = coffees.filter(coffee=> coffee._id !== id);
-          setCoffees(remainingCoffee);
-        });
-     }
-    });
-  };
-
+  // Handlers for actions
+   
 
   const handleEdit = (id) => {
     console.log(`Edit coffee with id: ${id}`);
     // Add edit logic here
+  };
+
+  
+  const handleDeleteCoffee = (id) => {
+    handleDelete(id);
+    const remainingCoffee = coffees.filter(coffee => coffee._id !== id);
+    setCoffees(remainingCoffee); 
   };
 
   const handleView = (id) => {
@@ -55,22 +34,37 @@ const PopularProducts = () => {
 
   const handleAddCoffee = () => {
     console.log("Add new coffee");
-   
+    // Add logic to handle adding new coffee
   };
 
+  useEffect(() => {
+    // Simulate loading delay, if you're fetching data, you can replace this with your fetch logic
+    if (Array.isArray(loadCoffees)) {
+      setLoading(false); // Stop loading when data is ready
+    }
+  }, [loadCoffees]);
+
+  // Loading state or empty array protection
+  if (loading) {
+    return <div className="flex min-h-96 justify-center items-center">
+      <span className="loading loading-spinner loading-lg"></span>
+    </div>; // Show loading spinner or message
+  }
+
   return (
-    <div className=" text-[#331A15] min-h-screen flex flex-col items-center w-10/12 mx-auto">
-      <h1 className="text-5xl font-extrabold my-10 p-4 " style={{ textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)' }}>
+    <div className="text-[#331A15] min-h-screen flex flex-col items-center w-10/12 mx-auto">
+      <h1 className="text-5xl font-extrabold my-10 p-4" style={{ textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)' }}>
         Our Popular Coffee
       </h1>
-      <Link to='add-coffee'
+      <Link
+        to="add-coffee"
         className="mb-6 bg-gradient-to-r from-[#8B5E3C] to-[#D2B48C] text-white py-2 px-6 rounded-md shadow-lg hover:shadow-xl transition-transform transform hover:scale-105"
         onClick={handleAddCoffee}
       >
         Add Coffee
       </Link>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 ">
-        {coffees.map((coffee) => (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {coffees?.map((coffee) => (
           <div
             className="bg-[#F5F4F1] shadow-lg rounded-lg p-6 flex flex-col md:flex-row gap-4 hover:shadow-2xl hover:scale-y-105 transition-all duration-300"
             key={coffee._id}
@@ -104,24 +98,28 @@ const PopularProducts = () => {
 
             {/* Action Buttons Section */}
             <div className="flex flex-row gap-4 sm:gap-0 sm:flex sm:flex-col items-center justify-center w-full md:w-auto sm:space-y-4">
-            
-             <Link to={`/coffee-details/${coffee._id}`}>
-             <FaEye
-                className="text-[#331A15] hover:text-blue-500 cursor-pointer text-xl transition-transform transform hover:scale-110"
-                onClick={() => handleView(coffee._id)}
-              />
-             </Link>
-         
-             <Link to={`/update-coffee/${coffee._id}`}>
+              <Link to={`/coffee-details/${coffee._id}`}>
+                <FaEye
+                  className="text-[#331A15] hover:text-blue-500 cursor-pointer text-xl transition-transform transform hover:scale-110"
+                  onClick={() => handleView(coffee._id)}
+                />
+              </Link>
+
+            {
+              user &&   <Link to={`/update-coffee/${coffee._id}`}>
               <FaEdit
                 className="text-[#331A15] hover:text-[#8B5E3C] cursor-pointer text-xl transition-transform transform hover:scale-110"
                 onClick={() => handleEdit(coffee._id)}
               />
-              </Link>
-              <FaTrashAlt
-                className="text-[#331A15] hover:text-red-600 cursor-pointer text-xl transition-transform transform hover:scale-110"
-                onClick={() => handleDelete(coffee._id)}
-              />
+            </Link>
+            }
+
+             {
+              user &&  <FaTrashAlt
+              className="text-[#331A15] hover:text-red-600 cursor-pointer text-xl transition-transform transform hover:scale-110"
+              onClick={() => handleDeleteCoffee(coffee._id)}
+            />
+             }
             </div>
           </div>
         ))}

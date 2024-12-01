@@ -9,15 +9,23 @@ import { Gallery } from './components/Gallery';
 import ContactUs from './components/ContactUs';
 import Header from './components/Header';
 import { Navbar } from './components/Navbar';
+import { useFirebaseAuth } from './Providers/AuthProvider';
+import Footer from './components/Footer';
 
 function App() {
  
+const {loading} = useFirebaseAuth()
+
 
 
   return (
   <div className=''>
     <Navbar></Navbar>
-    <Outlet></Outlet>
+   {
+    loading ? <div className='min-h-screen flex justify-center items-center'><span className="loading loading-spinner loading-lg"></span></div>:  <Outlet></Outlet>
+   }
+
+   <Footer></Footer>
   </div>
   );
 }

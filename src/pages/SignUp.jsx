@@ -1,12 +1,13 @@
 import React from "react";
 import { FcGoogle } from "react-icons/fc";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import signupImage from "../assets/signup.gif";
 import { useFirebaseAuth } from "../Providers/AuthProvider";
 import Swal from "sweetalert2";
 
 const SignUp = () => {
   const { createUser } = useFirebaseAuth();
+  const navigate = useNavigate();
 
 
 
@@ -42,7 +43,7 @@ const SignUp = () => {
         }
             
 
-        fetch('http://localhost:5000/users', {
+        fetch('https://coffee-houser-server-second.vercel.app/users', {
             method:"POST",
             headers:{
                 'content-type':"application/json"
@@ -58,7 +59,9 @@ const SignUp = () => {
                     text: "Registration Successful",
                     footer: '<Link to="/signin">Now go please SignIn</Link>'
                   });
+                  navigate("/signin")
             }
+
         })
          }else{
             Swal.fire({

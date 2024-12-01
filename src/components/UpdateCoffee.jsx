@@ -39,7 +39,7 @@ const handleInputChange = (e)=>{
     }).then((result) => {
       /* Read more about isConfirmed, isDenied below */
       if (result.isConfirmed) {
-        fetch(`http://localhost:5000/coffee/${_id}`,{
+        fetch(`https://coffee-houser-server-second.vercel.app/coffee/${_id}`,{
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',

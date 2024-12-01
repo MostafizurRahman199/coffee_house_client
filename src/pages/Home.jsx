@@ -4,8 +4,10 @@ import UnderBanner from '../components/UnderBanner'
 import PopularProducts from '../components/PopularProducts'
 import { Gallery } from '../components/Gallery'
 import ContactUs from '../components/ContactUs'
+import { useLoaderData } from 'react-router-dom'
 
 const Home = () => {
+  const loadedCoffees = useLoaderData();
   return (
    <>
    <Banner/>

@@ -1,10 +1,18 @@
 import React from 'react'
-import { Link, NavLink } from 'react-router-dom';
+import { Link, NavLink, useLoaderData } from 'react-router-dom';
 import {  FaHome, FaPlus, FaInfoCircle, FaEnvelope, FaSignInAlt, FaUserPlus, FaUser, FaCog, FaSignOutAlt, FaList } from 'react-icons/fa';
 import NavbarAvatar from './NavbarAvatar';
 import logoImage from '../assets/logo.png'
+import { useFirebaseAuth } from '../Providers/AuthProvider';
 
 export const Navbar = () => {
+
+  const {user, signOutUser } = useFirebaseAuth();
+
+  const userSignOut =()=>{
+    signOutUser();
+
+  }
 
   const getNavLinkClasses = (isActive) =>
     `flex items-center gap-2 px-4 py-2  transition-all duration-100 ${
@@ -15,13 +23,14 @@ export const Navbar = () => {
   
   const links = (
     <>
+     
       {[
-        { to: "/", icon: <FaHome />, label: "Home" },
+         { to: "/", icon: <FaHome />, label: "Home" },
         { to: "/add-coffee", icon: <FaPlus />, label: "Add Coffee" },
-        { to: "/allListings", icon: <FaList />, label: "All Coffee" },
+        { to: "/allCoffee", icon: <FaList />, label: "All Coffee" },
         { to: "/about", icon: <FaInfoCircle />, label: "About" },
         { to: "/contact", icon: <FaEnvelope />, label: "Contact" },
-        { to: "/users", icon: <FaUser />, label: "Users" },
+       { to: "/users", icon: <FaUser />, label: "Users" },
       ].map(({ to, icon, label }) => (
         <li key={to}>
           <NavLink to={to} className={({ isActive }) => getNavLinkClasses(isActive)}>
@@ -30,16 +39,30 @@ export const Navbar = () => {
         </li>
       ))}
 
-          <li >
+    
+
+
+
+         {!user && <li >
           <NavLink to={"/signin"} className={({ isActive }) => `${getNavLinkClasses(isActive)} block md:hidden `}>
-            <FaSignInAlt /> Login
+            <FaSignInAlt /> Login+
           </NavLink>
-         </li> 
-          <li >
+         </li> }
+
+
+         {user && <li >
+          <NavLink onClick={userSignOut} className={({ isActive }) => `${getNavLinkClasses(isActive)} block md:hidden `}>
+            <FaSignInAlt /> Logout
+          </NavLink>
+         </li> }
+
+        
+         
+         {!user && <li >
           <NavLink to={"/signup"} className={({ isActive }) => `${getNavLinkClasses(isActive)} block md:hidden `}>
            <FaUserPlus /> Register
           </NavLink>
-        </li> 
+        </li> }
     </>
   );
   
@@ -87,13 +110,17 @@ export const Navbar = () => {
     <div className="navbar-end gap-2">
    <NavbarAvatar  getNavLinkClasses={ getNavLinkClasses}></NavbarAvatar>
 
-    <Link  to="/signin" className=' hover:text-white transition-all  text-md  border-2 border-[#331A15] text-[#331A15] px-3  py-2 rounded-2xl  hover:bg-[#331A15] hidden md:block'>
+{   !user && <Link  to="/signin" className=' hover:text-white transition-all  text-md  border-2 border-[#331A15] text-[#331A15] px-3  py-2 rounded-2xl  hover:bg-[#331A15] hidden md:block'>
       Login
-    </Link>
+    </Link>}
 
-    <Link to={"/signup"} className=' hover:text-white transition-all  text-md border-2 border-[#331A15] text-[#331A15]  px-3 py-2 rounded-2xl  hover:bg-[#331A15]  hidden md:block'>
+{ user &&   <button onClick={userSignOut}  to="/signin" className=' hover:text-white transition-all  text-md  border-2 border-[#331A15] text-[#331A15] px-3  py-2 rounded-2xl  hover:bg-[#331A15] hidden md:block'>
+      Logout
+    </button>}
+
+   { !user && <Link to={"/signup"} className=' hover:text-white transition-all  text-md border-2 border-[#331A15] text-[#331A15]  px-3 py-2 rounded-2xl  hover:bg-[#331A15]  hidden md:block'>
       Register
-    </Link>
+    </Link>}
     </div>
   </div>
     </div>
